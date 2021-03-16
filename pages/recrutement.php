@@ -76,6 +76,7 @@ if (isset($_POST["class-character"]) && isset($_POST["char-name"])){
         function classChar($characterUser, $bdd){
             for ($i = 0; $i < count($characterUser); $i++){
                 $statsChar = $bdd->getStatsClass($characterUser[$i]['char_class'], $characterUser[$i]['char_level']);
+                $nextLevel = $bdd->getNextLevel($characterUser[$i]['char_level']);
                 $character = new Character(
                     $characterUser[$i]['id'],
                     $characterUser[$i]['char_class'], 
@@ -86,19 +87,20 @@ if (isset($_POST["class-character"]) && isset($_POST["char-name"])){
                     $characterUser[$i]['char_spirit'] + $statsChar[0]['char_spirit'],
                     $characterUser[$i]['char_life'] + $statsChar[0]['char_life'],
                     $characterUser[$i]['char_level'],
-                    $characterUser[$i]['char_experience']
+                    $characterUser[$i]['char_experience'],
+                    $nextLevel
                 );
 
                 echo "<p>Vous avez recruté : </p>";
-                echo "Name : " . $character->getCharName() . '<br>'; 
-                echo "Classe : " . $character->getCharClass() . '<br>'; 
-                echo "Force : " . $character->getCharForce() . '<br>'; 
-                echo "Intelligence : " . $character->getCharIntelligence() . '<br>'; 
-                echo "Dextérité : " . $character->getCharDexterity() . '<br>'; 
-                echo "Esprit : " . $character->getCharSpirit() . '<br>'; 
-                echo "Vie : " . $character->getCharLife() . '<br>'; 
-                echo "Niveau : " . $character->getCharLevel() . '<br>'; 
-                echo "Expérience : " . $character->getCharExperience() . '<br>'; 
+                echo "Name : " . $character->getName() . '<br>'; 
+                echo "Classe : " . $character->getClass() . '<br>'; 
+                echo "Force : " . $character->getForce() . '<br>'; 
+                echo "Intelligence : " . $character->getIntelligence() . '<br>'; 
+                echo "Dextérité : " . $character->getDexterity() . '<br>'; 
+                echo "Esprit : " . $character->getSpirit() . '<br>'; 
+                echo "Vie : " . $character->getLife() . '<br>'; 
+                echo "Niveau : " . $character->getLevel() . '<br>'; 
+                echo "Expérience : " . $character->getExperience() . '<br>'; 
             }
         }
 
