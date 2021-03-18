@@ -16,6 +16,7 @@ class Game {
     private $allCharacterId;
     private $turnNameGroup = 'characterGroup';
     private $targetNameGroup = 'monsterGroup';
+    private $distanceCM;
 
     public function __construct($characterGroup){
         $this->characterGroup = $characterGroup;
@@ -23,12 +24,13 @@ class Game {
 
     public function fight($monsterGroup){
 
-        //todo - Les monstres doivent taper avec des dégat différent que 1
-        //todo - Les monstres commencent à avoir plusieurs compétence 
-        //todo - regrouper les deux boucles for du combat en une seule
+        //todo - Les monstres et personnages commencent à avoir plusieurs compétence 
+        //todo - créer un système de distance entre character et monstres
 
         $this->setMonsterGroup($monsterGroup);
         $round = 0;
+
+        $this->initDistanceArray();
 
         while($this->inFight){
 
@@ -39,7 +41,17 @@ class Game {
 
                 if ($this->{$this->turnNameGroup}[$i]->getAlive()){
                     $this->{$this->turnNameGroup}[$i]->searchCible($this->{$this->targetNameGroup});
-                    $this->log = $this->log . $this->{$this->targetNameGroup}[$this->{$this->turnNameGroup}[$i]->getCible()]->takeDmg($this->{$this->turnNameGroup}[$i]->getForce(), $this->{$this->turnNameGroup}[$i]->getName());
+                    if ($this->turnNameGroup == 'characterGroup'){
+                        //on compare la distance qu'à besoin le personnage pour taper et la distance entre le personnage et le monstre
+                        if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$i][$this->{$this->turnNameGroup}[$i]->getCible()]){
+                            $this->authorizedToHit($i);
+                        }
+                    }else {
+                        if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$this->{$this->turnNameGroup}[$i]->getCible()][$i]){
+                            $this->authorizedToHit($i);
+                        }
+                    }
+                    
                 }
 
                 //On vérifie si le groupe du monstre ou les personnages sont encore en vie
@@ -68,63 +80,6 @@ class Game {
                 }
                 
             }
-
-            //Le personnage doit cibler un monstre en question et il doit recevoir des dégats
-
-            /* [obsolete]
-            for ($i = 0; $i < count($this->characterGroup); $i++){
-
-                //On vérifie si le personnage est en vie et après on tape le monstre
-
-                if ($this->characterGroup[$i]->getAlive()){
-                    $this->characterGroup[$i]->searchCible($this->monsterGroup);
-                    $this->log = $this->log . $this->monsterGroup[$this->characterGroup[$i]->getCible()]->takeDmg($this->characterGroup[$i]->getCharForce(), $this->characterGroup[$i]->getCharName());
-                }
-
-                //On vérifie si le groupe du monstre est encore en vie
-
-                $this->countAlive("getMonsterLife", "monsterGroup", "setMonsterGroupInLife");
-                $this->countAlive("getCharLife", "characterGroup", "setCharacterGroupInLife");
-
-                //Si le groupe du monstre est mort, alors on envoie les logs
-
-                if ($this->nbCharacterGroupInLife == 0 || $this->nbMonsterGroupInLife == 0){
-                    $this->log = $this->log . "Votre groupe à battu les monstres, vous gagnez de l'expérience.<br>";
-                    $this->fightTime = $round * 2;
-                    $this->calculExperience();
-                    $this->checkCharacterInLife();
-
-                return [$this->log, $this->experienceGain, $this->characterInLife];
-                }
-                
-            }
-
-            for ($i = 0; $i < count($this->monsterGroup); $i++){
-
-                //Le monstre tape le personnage
-
-                if ($this->monsterGroup[$i]->getAlive()){
-                    $this->monsterGroup[$i]->searchCible($this->characterGroup);
-                    $this->log = $this->log . $this->characterGroup[$this->monsterGroup[$i]->getCible()]->takeDmg(1, $this->monsterGroup[$i]->getMonsterName());
-                }
-
-                //On vérifie si le groupe du personnage est encore en vie
-
-                $this->countAlive("getMonsterLife", "monsterGroup", "setMonsterGroupInLife");
-                $this->countAlive("getCharLife", "characterGroup", "setCharacterGroupInLife");
-
-                //Si le groupe du personnage est mort, alors on envoie les logs
-
-                if ($this->nbCharacterGroupInLife == 0 || $this->nbMonsterGroupInLife == 0){
-                    $this->log = $this->log . "Votre groupe à échoué, vous gagnez seulement la moitié d'expérience des monstres tué.<br>";
-                    $this->fightTime = $round * 2;
-                    $this->calculExperience();
-                    $this->getAllCharacterId();
-                    
-                    return [$this->log, $this->experienceGain / 2, $this->allCharacterId];
-                }
-                
-            }*/
 
             //On change le tour du groupe
 
@@ -212,5 +167,19 @@ class Game {
             $this->log = $this->log . $this->characterGroup[$i]->getName() . ' a gagné un niveau est passe au niveau ' . $this->characterGroup[$i]->getLevel() . '. <br>';
         }
         
+    }
+
+    //on initie la distance des monstres pour chaque personnages
+
+    public function initDistanceArray(){
+        for ($i = 0; $i < count($this->characterGroup); $i++){
+            for ($a = 0; $a < count($this->monsterGroup); $a++){
+                $this->distanceCM[$i][] = 10;
+            }
+        }
+    }
+
+    public function authorizedToHit($i){
+            $this->log = $this->log . $this->{$this->targetNameGroup}[$this->{$this->turnNameGroup}[$i]->getCible()]->takeDmg($this->{$this->turnNameGroup}[$i]->getForce(), $this->{$this->turnNameGroup}[$i]->getName());
     }
 }

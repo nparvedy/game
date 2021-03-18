@@ -130,31 +130,6 @@ function test($zone){
 
             echo $form;
 
-        /*[obsolete]
-        for ($i = 0; $i < count($listMonster); $i++) {
-
-            //Affiche le form si le groupe n'est pas le même que l'ancien groupe
-            $typeGroup = $listMonster[$i]['groupe'];
-            $form = "
-            <h3>{$listMonster[$i]['monster_name']}</h3>
-            <form action=\"\" method=\"post\">
-                <input name=\"monsterId\" type=\"hidden\" id=\"monsterId\" value=\"{$listMonster[$i]['id']}\">
-                <input name=\"monsterGroup\" type=\"hidden\" id=\"monsterGroup\" value=\"{$listMonster[$i]['groupe']}\">
-                <input type=\"submit\" value=\"Combattre\">
-            </form>
-            ";
-
-            if (isset($lastGroup)) {
-
-                if ($typeGroup != $lastGroup) {
-                    echo $form;
-                }
-            }else {
-                //affiche le premier form de la boucle
-                echo $form;
-            }
-            $lastGroup = $typeGroup;
-        }*/
         }
     }
     

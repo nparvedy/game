@@ -9,6 +9,7 @@ class Monster {
     private $cible = 0;
     private $multiCible;
     private $alive = true;
+    private $distanceNeeded = 10;
 
     public function __construct($name, $life, $force, $level, $experienceGain){
         $this->name = $name;
@@ -51,6 +52,10 @@ class Monster {
         return $this->force; 
     }
 
+    public function getDistanceNeeded(){
+        return $this->distanceNeeded;
+    }
+
     //setter
 
     public function setLife($vie){
@@ -74,6 +79,7 @@ class Monster {
             }
         }
     }
+
 
     
 }

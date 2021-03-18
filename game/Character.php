@@ -19,6 +19,7 @@ class Character {
     private $cible = 0;
     private $alive = true;
     private $nextLevel;
+    private $distanceNeeded = 10;
 
     public function __construct($id, $class, $name, $force, $intelligence, $dexterity, $spirit, $life, $level, $experience, $nextLevel){
         $this->id = $id;
@@ -32,6 +33,7 @@ class Character {
         $this->level = $level; 
         $this->experience = $experience;
         $this->nextLevel = $nextLevel;
+        
 
     }
 
@@ -112,6 +114,10 @@ class Character {
 
     public function getNextLevel(){
         return $this->nextLevel;
+    }
+
+    public function getDistanceNeeded(){
+        return $this->distanceNeeded;
     }
 
     //setter
