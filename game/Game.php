@@ -26,6 +26,7 @@ class Game {
 
         //todo - Les monstres et personnages commencent à avoir plusieurs compétence 
         //todo - créer un système de distance entre character et monstres
+        //todo - améliorer le système de distance
 
         $this->setMonsterGroup($monsterGroup);
         $round = 0;
@@ -41,14 +42,35 @@ class Game {
 
                 if ($this->{$this->turnNameGroup}[$i]->getAlive()){
                     $this->{$this->turnNameGroup}[$i]->searchCible($this->{$this->targetNameGroup});
+
+                    //si c'est le tour des utilisateurs sinon tour des monstres
                     if ($this->turnNameGroup == 'characterGroup'){
-                        //on compare la distance qu'à besoin le personnage pour taper et la distance entre le personnage et le monstre
-                        if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$i][$this->{$this->turnNameGroup}[$i]->getCible()]){
-                            $this->authorizedToHit($i);
+                        //on vérifie si on a une compétence aoeDmg
+                        if (method_exists($this->{$this->turnNameGroup}[$i], 'aoeDmg')){
+                            //si c'est le cas, alors on vas taper toutes les cibles qui sont proches
+                            //on récupère toutes les cibles à porter
+
+                            $this->{$this->turnNameGroup}[$i]->resetMulticible();
+
+                            for ($a = 0; $a < count($this->{$this->targetNameGroup}); $a++){
+                                if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$i][$this->{$this->turnNameGroup}[$i]->getCible()] && $this->{$this->targetNameGroup}[$a]->getLife() > 0){
+                                    $this->{$this->turnNameGroup}[$i]->setMulticible($a);
+                                }
+                            }
+
+                            $this->log = $this->log . $this->{$this->turnNameGroup}[$i]->getName() . ' décide de lancer ' . $this->{$this->turnNameGroup}[$i]->getNameAoe(0) . '.<br>';
+
+                            $this->authorizedToHit($i, true);
+                        }else {
+                            //on compare la distance qu'à besoin le personnage pour taper et la distance entre le personnage et le monstre
+                            if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$i][$this->{$this->turnNameGroup}[$i]->getCible()]){
+                                $this->authorizedToHit($i, false);
+                            }
                         }
+                        
                     }else {
                         if ($this->{$this->turnNameGroup}[$i]->getDistanceNeeded() <= $this->distanceCM[$this->{$this->turnNameGroup}[$i]->getCible()][$i]){
-                            $this->authorizedToHit($i);
+                            $this->authorizedToHit($i, false);
                         }
                     }
                     
@@ -179,7 +201,14 @@ class Game {
         }
     }
 
-    public function authorizedToHit($i){
+    public function authorizedToHit($i, $isMulti){
+        if ($isMulti){
+            $dmgAoe = $this->{$this->turnNameGroup}[$i]->aoeDmg(0);
+            for ($a = 0; $a < count($this->{$this->turnNameGroup}[$i]->getMulticible()); $a++){
+                $this->log = $this->log . $this->{$this->targetNameGroup}[$this->{$this->turnNameGroup}[$i]->getMulticible()[$a]]->takeDmg($dmgAoe, $this->{$this->turnNameGroup}[$i]->getName());
+            }
+        }else {
             $this->log = $this->log . $this->{$this->targetNameGroup}[$this->{$this->turnNameGroup}[$i]->getCible()]->takeDmg($this->{$this->turnNameGroup}[$i]->getForce(), $this->{$this->turnNameGroup}[$i]->getName());
+        }
     }
 }

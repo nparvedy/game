@@ -19,7 +19,7 @@ class Character {
     private $cible = 0;
     private $alive = true;
     private $nextLevel;
-    private $distanceNeeded = 10;
+    private $multicible;
 
     public function __construct($id, $class, $name, $force, $intelligence, $dexterity, $spirit, $life, $level, $experience, $nextLevel){
         $this->id = $id;
@@ -33,8 +33,6 @@ class Character {
         $this->level = $level; 
         $this->experience = $experience;
         $this->nextLevel = $nextLevel;
-        
-
     }
 
     //Function
@@ -120,6 +118,10 @@ class Character {
         return $this->distanceNeeded;
     }
 
+    public function getMulticible(){
+        return $this->multicible;
+    }
+
     //setter
 
     public function setName(){
@@ -152,5 +154,13 @@ class Character {
 
     public function setLevel(){
        $this->level++;
+    }
+
+    public function setMulticible($cible){
+        $this->multicible[] = $cible;
+    }
+
+    public function resetMulticible(){
+        $this->multicible = [];
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+
+
 date_default_timezone_set("Europe/Paris");
 session_start();
 require '../config/bdd.php';
@@ -31,12 +34,19 @@ if (isset($_POST["class-character"]) && isset($_POST["char-name"])) {
 $characterUser = $bdd->characterUser($_SESSION['id']);
 $nbCharacter = count($characterUser);
 
+
 function classChar($characterUser, $bdd)
 {
     for ($i = 0; $i < count($characterUser); $i++) {
         $statsChar = $bdd->getStatsClass($characterUser[$i]['char_class'], $characterUser[$i]['char_level']);
         $nextLevel = $bdd->getNextLevel($characterUser[$i]['char_level']);
-        $character[] = new Character(
+        $class = ucwords($characterUser[$i]['char_class']);
+
+        spl_autoload_register(function ($class_name) {
+            include '../game/classCharacter/' . $class_name . '.php';
+        });
+        
+        $character[] = new $class(
             $characterUser[$i]['id'],
             $characterUser[$i]['char_class'],
             $characterUser[$i]['char_name'],
